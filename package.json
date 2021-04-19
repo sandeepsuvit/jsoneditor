@@ -19,7 +19,7 @@
     "bugs": "https://github.com/josdejong/jsoneditor/issues",
     "scripts": {
         "build": "gulp",
-        "deploy": "gulp build-deploy",
+        "build-deploy": "gulp && gulp build-deploy && gulp replace-dom",
         "minify": "gulp minify",
         "start": "gulp watch",
         "test": "mocha test --require @babel/register",
@@ -48,6 +48,7 @@
         "gulp": "4.0.2",
         "gulp-clean-css": "4.3.0",
         "gulp-concat-css": "3.1.0",
+        "gulp-dom": "^1.0.0",
         "gulp-rename": "^2.0.0",
         "gulp-sass": "4.1.0",
         "jsdom": "16.5.3",

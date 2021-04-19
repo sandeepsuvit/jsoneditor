@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const gulp = require('gulp')
 const gulpRename = require('gulp-rename')
+const gulpDom = require('gulp-dom')
 const log = require('fancy-log')
 const format = require('date-format')
 const concatCss = require('gulp-concat-css')
@@ -231,6 +232,24 @@ gulp.task('build-deploy', function(done) {
         .pipe(gulp.dest('dist/'))
 
     done()
+})
+
+// Replace DOM - Added by Needle
+gulp.task('replace-dom', function(done) {
+    return gulp.src('dist/index.html')
+        .pipe(gulpDom(function() {
+            var linkElem = this.querySelector('link[replace]');
+            var scriptElem = this.querySelector('script[replace]');
+
+            linkElem.setAttribute('href', 'jsoneditor.css');
+            scriptElem.setAttribute('src', 'jsoneditor.js');
+
+            linkElem.removeAttribute('replace');
+            scriptElem.removeAttribute('replace');
+
+            return this; // return the whole Document
+        }))
+        .pipe(gulp.dest('dist'));
 })
 
 // The watch task (to automatically rebuild when the source code changes)
