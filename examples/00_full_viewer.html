@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>JSON Editor</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="../dist/jsoneditor.css" rel="stylesheet" type="text/css">
+    <script src="../dist/jsoneditor.js"></script>
+
+    <script src="https://bgrins.github.io/filereader.js/filereader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
+
+    <style type="text/css">
+        * {
+            margin: 0%;
+            padding: 0%;
+        }
+        
+        html,
+        body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue";
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+        }
+        
+        .columns {
+            display: flex;
+            flex: 1;
+        }
+        
+        .jsoneditor {
+            border: none;
+        }
+        
+        .jsoneditor-poweredBy {
+            display: none;
+        }
+        
+        .jsoneditor-tree input[type="checkbox"] {
+            margin: .4rem 0;
+        }
+        
+        .width-full {
+            display: flex;
+            flex: 1;
+        }
+        
+        .center-panel {
+            width: 2rem;
+            background: #f8f8f8;
+            flex: none;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .control-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* flex: 1; */
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        
+        .mb-5 {
+            margin-bottom: 5rem;
+        }
+        
+        .btn-svg {
+            width: 1.5rem;
+            margin: .5rem 0;
+            color: #aaa;
+        }
+        
+        .btn-svg:hover {
+            cursor: pointer;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="content">
+        <div class="columns">
+            <aside class="width-full" id="jsoneditor_v1"></aside>
+            <aside class="center-panel width-full">
+                <div class="control-unit">
+                    <svg id="copy_to_r_btn" xmlns="http://www.w3.org/2000/svg" class="btn-svg h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <svg id="copy_to_l_btn" xmlns="http://www.w3.org/2000/svg" class="btn-svg h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+
+                <div class="control-unit">
+                    <input type="file" id="loadDocument" style="display: none;" />
+
+                    <svg id="new_json_btn" xmlns="http://www.w3.org/2000/svg" class="btn-svg h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                            clip-rule="evenodd" />
+                    </svg>
+
+                    <svg id="load_json_btn" xmlns="http://www.w3.org/2000/svg" class="btn-svg h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z"
+                            clip-rule="evenodd" />
+                        <path d="M6 12a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2H2h2a2 2 0 002-2v-2z" />
+                    </svg>
+                    <svg id="save_json_btn" xmlns="http://www.w3.org/2000/svg" class="btn-svg h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                        <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 9v4m0 0l-2-2m2 2l2-2" />
+                    </svg>
+                </div>
+                <div class="control-unit">
+                    <svg id="about_btn" xmlns="http://www.w3.org/2000/svg" class="btn-svg h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+            </aside>
+            <aside class="width-full" id="jsoneditor_v2"></aside>
+        </div>
+    </section>
+
+    <script>
+        // Sample Json
+        const json = {
+            'array': [1, 2, 3],
+            'boolean': true,
+            'null': null,
+            'number': 123,
+            'object': {
+                'a': 'b',
+                'c': 'd'
+            },
+            'string': 'Hello World'
+        };
+
+        // create the editor
+        const editorContainer1 = document.getElementById('jsoneditor_v1');
+        const editorContainer2 = document.getElementById('jsoneditor_v2');
+
+        const optionsForEditor1 = {
+            mode: 'code',
+            modes: ['code', 'form', 'text', 'tree', 'view', 'preview'], // allowed modes
+            onError: function(err) {
+                alert(err.toString());
+            },
+            onModeChange: function(newMode, oldMode) {
+                console.log('Mode switched from', oldMode, 'to', newMode);
+            }
+        };
+
+        const optionsForEditor2 = {
+            mode: 'tree',
+            modes: ['code', 'form', 'text', 'tree', 'view', 'preview'], // allowed modes
+            onError: function(err) {
+                alert(err.toString());
+            },
+            onModeChange: function(newMode, oldMode) {
+                console.log('Mode switched from', oldMode, 'to', newMode);
+            }
+        };
+
+        // Initialize the editors
+        const editor1 = new JSONEditor(editorContainer1, optionsForEditor1, json);
+        const editor2 = new JSONEditor(editorContainer2, optionsForEditor2);
+
+        // Copy to right
+        document.getElementById('copy_to_r_btn').onclick = function() {
+            editor2.set(editor1.get());
+        }
+
+        // Copy to left
+        document.getElementById('copy_to_l_btn').onclick = function() {
+            editor1.set(editor2.get());
+        }
+
+        // New file
+        document.getElementById('new_json_btn').onclick = function() {
+            editor1.set({});
+            editor2.set({});
+        }
+
+        // Load a JSON document
+        document.getElementById('load_json_btn').onclick = function() {
+            document.getElementById('loadDocument').click();
+        }
+
+        // Save a JSON document
+        document.getElementById('save_json_btn').onclick = function() {
+            // Check for empty json
+            if (isJsonEmpty(editor1.getText())) {
+                alert('No content to save');
+                return;
+            }
+
+            // Save Dialog
+            let fname = window.prompt("Save as...");
+
+            // Check json extension in file name
+            if (fname.indexOf(".") === -1) {
+                fname = fname + ".json";
+            } else {
+                if (fname.split('.').pop().toLowerCase() === "json") {
+                    // Nothing to do
+                } else {
+                    fname = fname.split('.')[0] + ".json";
+                }
+            }
+
+            const blob = new Blob([editor1.getText()], {
+                type: 'application/json;charset=utf-8'
+            });
+
+            saveAs(blob, fname);
+        }
+
+        // About
+        document.getElementById('about_btn').onclick = function() {
+            alert("This is a Needle Version of JSON Editor");
+        }
+
+        // Load a JSON document
+        FileReaderJS.setupInput(document.getElementById('loadDocument'), {
+            readAsDefault: 'Text',
+            on: {
+                load: function(event, file) {
+                    editor1.setText(event.target.result)
+                }
+            }
+        })
+
+        /** 
+         * Function to check if the object is empty or not
+         */
+        function isJsonEmpty(obj) {
+            obj = JSON.parse(obj);
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop)) {
+                    return false;
+                }
+            }
+
+            return JSON.stringify(obj) === JSON.stringify({});
+        }
+    </script>
+</body>
+
+</html>
